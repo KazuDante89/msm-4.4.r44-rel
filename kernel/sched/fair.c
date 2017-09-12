@@ -7239,27 +7239,37 @@ static int select_energy_cpu_brute(struct task_struct *p, int prev_cpu,
 	schedstat_inc(p, se.statistics.nr_wakeups_secb_attempts);
 	schedstat_inc(this_rq(), eas_stats.secb_attempts);
 
-	boosted = task_is_boosted(p);
+	if (sysctl_sched_sync_hint_enable && sync) {
+		int cpu = smp_processor_id();
+
+		if (cpumask_test_cpu(cpu, tsk_cpus_allowed(p))) {
+			schedstat_inc(p, se.statistics.nr_wakeups_secb_sync);
+			schedstat_inc(this_rq(), eas_stats.secb_sync);
+			return cpu;
+		}
+	}
+
 #ifdef CONFIG_CGROUP_SCHEDTUNE
 	prefer_idle = schedtune_prefer_idle(p) > 0;
 #else
 	prefer_idle = 0;
 #endif
 
+	rcu_read_lock();
+
 	sd = rcu_dereference(per_cpu(sd_ea, prev_cpu));
 	if (!sd) {
 		target_cpu = prev_cpu;
-		goto out;
+		goto unlock;
 	}
 
 	sync_entity_load_avg(&p->se);
 
 	/* Find a cpu with sufficient capacity */
-	next_cpu = find_best_target(p, &backup_cpu, boosted || sync_boost,
-				    prefer_idle);
+	next_cpu = find_best_target(p, &backup_cpu, boosted, prefer_idle);
 	if (next_cpu == -1) {
 		target_cpu = prev_cpu;
-		goto out;
+		goto unlock;
 	}
 
 	/* Unconditionally prefer IDLE CPUs for boosted/prefer_idle tasks */
@@ -7267,7 +7277,7 @@ static int select_energy_cpu_brute(struct task_struct *p, int prev_cpu,
 		schedstat_inc(p, se.statistics.nr_wakeups_secb_idle_bt);
 		schedstat_inc(this_rq(), eas_stats.secb_idle_bt);
 		target_cpu = next_cpu;
-		goto out;
+		goto unlock;
 	}
 
 	target_cpu = prev_cpu;
@@ -7277,9 +7287,9 @@ static int select_energy_cpu_brute(struct task_struct *p, int prev_cpu,
 			.p              = p,
 			.util_delta     = task_util_est(p),
 			.src_cpu        = prev_cpu,
-			.dst_cpu        = target_cpu,
+			.dst_cpu        = next_cpu,
+			.trg_cpu	= next_cpu,
 			.p              = p,
-			.trg_cpu        = target_cpu,
 		};
 
 
@@ -7293,15 +7303,23 @@ static int select_energy_cpu_brute(struct task_struct *p, int prev_cpu,
 			schedstat_inc(p, se.statistics.nr_wakeups_secb_insuff_cap);
 			schedstat_inc(this_rq(), eas_stats.secb_insuff_cap);
 			target_cpu = next_cpu;
-			goto out;
+			goto unlock;
 		}
 
-		/* Check if EAS_CPU_NXT is a more energy efficient CPU */
-		if (select_energy_cpu_idx(&eenv) != EAS_CPU_PRV) {
-			schedstat_inc(p, se.statistics.nr_wakeups_secb_nrg_sav);
-			schedstat_inc(this_rq(), eas_stats.secb_nrg_sav);
-			target_cpu = eenv.cpu[eenv.next_idx].cpu_id;
-			goto out;
+		target_cpu = next_cpu;
+		if (energy_diff(&eenv) >= 0) {
+			/* No energy saving for target_cpu, try backup */
+			target_cpu = backup_cpu;
+			eenv.dst_cpu = backup_cpu;
+			eenv.trg_cpu = backup_cpu;
+			if (backup_cpu < 0 ||
+			    backup_cpu == prev_cpu ||
+			    energy_diff(&eenv) >= 0) {
+				schedstat_inc(p, se.statistics.nr_wakeups_secb_no_nrg_sav);
+				schedstat_inc(this_rq(), eas_stats.secb_no_nrg_sav);
+				target_cpu = prev_cpu;
+				goto unlock;
+			}
 		}
 
 		schedstat_inc(p, se.statistics.nr_wakeups_secb_no_nrg_sav);
