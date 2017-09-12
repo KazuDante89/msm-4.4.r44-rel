@@ -5715,11 +5715,18 @@ struct energy_env {
 	/* Utilization to move */
 	struct task_struct	*p;
 	int			util_delta;
-
-	/* Mask of CPUs candidates to evaluate */
-	cpumask_t		cpus_mask;
-
-	/* CPU candidates to evaluate */
+	int			src_cpu;
+	int			dst_cpu;
+	int			trg_cpu;
+	int			energy;
+	int			payoff;
+	struct task_struct	*p;
+	struct {
+		int before;
+		int after;
+		int delta;
+		int diff;
+	} nrg;
 	struct {
 
 		/* CPU ID, must be in cpus_mask */
@@ -6011,7 +6018,7 @@ long group_norm_util(struct energy_env *eenv, int cpu_idx)
 	unsigned long util, util_sum = 0;
 	int cpu;
 
-	for_each_cpu(cpu, sched_group_cpus(eenv->sg)) {
+	for_each_cpu(cpu, sched_group_cpus(sg)) {
 		util = cpu_util_without(cpu, eenv->p);
 
 		/*
@@ -6081,7 +6088,7 @@ static int group_idle_state(struct energy_env *eenv, int cpu_idx)
 	 */
 	for_each_cpu(i, sched_group_cpus(sg)) {
 		grp_util += cpu_util_without(i, eenv->p);
-		if (unlikely(i == eenv->cpu[cpu_idx].cpu_id))
+		if (unlikely(i == eenv->trg_cpu))
 			grp_util += eenv->util_delta;
 	}
 
@@ -6296,9 +6303,18 @@ static inline int select_energy_cpu_idx(struct energy_env *eenv)
 {
 	struct sched_domain *sd;
 	struct sched_group *sg;
-	int sd_cpu = -1;
-	int cpu_idx;
-	int margin;
+	int sd_cpu = -1, energy_before = 0, energy_after = 0;
+	int diff, margin;
+
+	struct energy_env eenv_before = {
+		.util_delta	= task_util_est(eenv->p),
+		.src_cpu	= eenv->src_cpu,
+		.dst_cpu	= eenv->dst_cpu,
+		.trg_cpu	= eenv->src_cpu,
+		.nrg		= { 0, 0, 0, 0},
+		.cap		= { 0, 0, 0 },
+		.p  		= eenv->p,
+	};
 
 	sd_cpu = eenv->cpu[EAS_CPU_PRV].cpu_id;
 	sd = rcu_dereference(per_cpu(sd_ea, sd_cpu));
@@ -6327,10 +6343,17 @@ static inline int select_energy_cpu_idx(struct energy_env *eenv)
 
 	} while (sg = sg->next, sg != sd->groups);
 
-	/* Scale energy before comparisons */
-	for (cpu_idx = EAS_CPU_PRV; cpu_idx < EAS_CPU_CNT; ++cpu_idx)
-		eenv->cpu[cpu_idx].energy >>= SCHED_CAPACITY_SHIFT;
-
+	eenv->nrg.before = energy_before;
+	eenv->nrg.after = energy_after;
+	eenv->nrg.diff = eenv->nrg.after - eenv->nrg.before;
+	eenv->payoff = 0;
+#ifndef CONFIG_SCHED_TUNE
+//	trace_sched_energy_diff(eenv->p,
+//			eenv->src_cpu, eenv->dst_cpu, eenv->util_delta,
+//			eenv->nrg.before, eenv->nrg.after, eenv->nrg.diff,
+//			eenv->cap.before, eenv->cap.after, eenv->cap.delta,
+//			eenv->nrg.delta, eenv->payoff);
+#endif
 	/*
 	 * Compute the dead-zone margin used to prevent too many task
 	 * migrations with negligible energy savings.
@@ -6339,11 +6362,96 @@ static inline int select_energy_cpu_idx(struct energy_env *eenv)
 	 */
 	margin = eenv->cpu[EAS_CPU_PRV].energy >> 6;
 
-	/*
-	 * By default the EAS_CPU_PRV CPU is considered the most energy
-	 * efficient, with a 0 energy variation.
-	 */
-	eenv->next_idx = EAS_CPU_PRV;
+	margin = eenv->nrg.before >> 6; /* ~1.56% */
+
+	diff = eenv->nrg.after - eenv->nrg.before;
+
+	eenv->nrg.diff = (abs(diff) < margin) ? 0 : eenv->nrg.diff;
+
+	return eenv->nrg.diff;
+}
+
+#ifdef CONFIG_SCHED_TUNE
+
+struct target_nrg schedtune_target_nrg;
+
+#ifdef CONFIG_CGROUP_SCHEDTUNE
+extern bool schedtune_initialized;
+#endif /* CONFIG_CGROUP_SCHEDTUNE */
+
+/*
+ * System energy normalization
+ * Returns the normalized value, in the range [0..SCHED_CAPACITY_SCALE],
+ * corresponding to the specified energy variation.
+ */
+static inline int
+normalize_energy(int energy_diff)
+{
+	u32 normalized_nrg;
+
+#ifdef CONFIG_CGROUP_SCHEDTUNE
+	/* during early setup, we don't know the extents */
+	if (unlikely(!schedtune_initialized))
+		return energy_diff < 0 ? -1 : 1 ;
+#endif /* CONFIG_CGROUP_SCHEDTUNE */
+
+#ifdef CONFIG_SCHED_DEBUG
+	{
+	int max_delta;
+
+	/* Check for boundaries */
+	max_delta  = schedtune_target_nrg.max_power;
+	max_delta -= schedtune_target_nrg.min_power;
+	WARN_ON(abs(energy_diff) >= max_delta);
+	}
+#endif
+
+	/* Do scaling using positive numbers to increase the range */
+	normalized_nrg = (energy_diff < 0) ? -energy_diff : energy_diff;
+
+	/* Scale by energy magnitude */
+	normalized_nrg <<= SCHED_CAPACITY_SHIFT;
+
+	/* Normalize on max energy for target platform */
+	normalized_nrg = reciprocal_divide(
+			normalized_nrg, schedtune_target_nrg.rdiv);
+
+	return (energy_diff < 0) ? -normalized_nrg : normalized_nrg;
+}
+
+static inline int
+energy_diff(struct energy_env *eenv)
+{
+	int boost = schedtune_task_boost(eenv->p);
+	int nrg_delta;
+
+	/* Conpute "absolute" energy diff */
+	__energy_diff(eenv);
+
+	/* Return energy diff when boost margin is 0 */
+	if (boost == 0) {
+//		trace_sched_energy_diff(eenv->p,
+//				eenv->src_cpu, eenv->dst_cpu, eenv->util_delta,
+//				eenv->nrg.before, eenv->nrg.after, eenv->nrg.diff,
+//				eenv->cap.before, eenv->cap.after, eenv->cap.delta,
+//				0, -eenv->nrg.diff);
+		return eenv->nrg.diff;
+	}
+
+	/* Compute normalized energy diff */
+	nrg_delta = normalize_energy(eenv->nrg.diff);
+	eenv->nrg.delta = nrg_delta;
+
+	eenv->payoff = schedtune_accept_deltas(
+			eenv->nrg.delta,
+			eenv->cap.delta,
+			eenv->p);
+
+//	trace_sched_energy_diff(eenv->p,
+//			eenv->src_cpu, eenv->dst_cpu, eenv->util_delta,
+//			eenv->nrg.before, eenv->nrg.after, eenv->nrg.diff,
+//			eenv->cap.before, eenv->cap.after, eenv->cap.delta,
+//			eenv->nrg.delta, eenv->payoff);
 
 	/*
 	 * Compare the other CPU candidates to find a CPU which can be
@@ -6547,7 +6655,7 @@ boosted_task_util(struct task_struct *p)
 	unsigned long util = task_util_est(p);
 	long margin = schedtune_task_margin(p);
 
-	trace_sched_boost_task(p, util, margin);
+//	trace_sched_boost_task(p, util, margin);
 
 	return util + margin;
 }
@@ -7295,18 +7403,10 @@ static int select_energy_cpu_brute(struct task_struct *p, int prev_cpu,
 		struct energy_env eenv = {
 			.p              = p,
 			.util_delta     = task_util_est(p),
-			/* Task's previous CPU candidate */
-			.cpu[EAS_CPU_PRV] = {
-				.cpu_id = prev_cpu,
-			},
-			/* Main alternative CPU candidate */
-			.cpu[EAS_CPU_NXT] = {
-				.cpu_id = next_cpu,
-			},
-			/* Backup alternative CPU candidate */
-			.cpu[EAS_CPU_BKP] = {
-				.cpu_id = backup_cpu,
-			},
+			.src_cpu        = prev_cpu,
+			.dst_cpu        = target_cpu,
+			.p              = p,
+			.trg_cpu        = target_cpu,
 		};
 
 
