@@ -439,6 +439,7 @@ __primary_switched:
         msr     sp_el0, x5                      // Save thread_info
 #else
 	adr_l	sp, initial_sp, x4
+	add     sp, x4, :lo12:initial_sp
 	mov	x4, sp
 	and	x4, x4, #~(THREAD_SIZE - 1)
 	msr	sp_el0, x4			// Save thread_info
