@@ -571,34 +571,34 @@ afunc_bind(struct usb_configuration *cfg, struct usb_function *fn)
 	uac2->as_in_intf = ret;
 	uac2->as_in_alt = 0;
 
-	/* Calculate wMaxPacketSize according to audio bandwidth */
-	ret = set_ep_max_packet_size(uac2_opts, &fs_epin_desc, USB_SPEED_FULL,
-				     true);
-	if (ret < 0) {
-		dev_err(dev, "%s:%d Error!\n", __func__, __LINE__);
-		return ret;
-	}
+        /* Calculate wMaxPacketSize according to audio bandwidth */
+        ret = set_ep_max_packet_size(uac2_opts, &fs_epin_desc, USB_SPEED_FULL,
+                                     true);
+        if (ret < 0) {
+                dev_err(dev, "%s:%d Error!\n", __func__, __LINE__);
+                return ret;
+        }
 
-	ret = set_ep_max_packet_size(uac2_opts, &fs_epout_desc, USB_SPEED_FULL,
-				     false);
-	if (ret < 0) {
-		dev_err(dev, "%s:%d Error!\n", __func__, __LINE__);
-		return ret;
-	}
+        ret = set_ep_max_packet_size(uac2_opts, &fs_epout_desc, USB_SPEED_FULL,
+                                     false);
+        if (ret < 0) {
+                dev_err(dev, "%s:%d Error!\n", __func__, __LINE__);
+                return ret;
+        }
 
-	ret = set_ep_max_packet_size(uac2_opts, &hs_epin_desc, USB_SPEED_HIGH,
-				     true);
-	if (ret < 0) {
-		dev_err(dev, "%s:%d Error!\n", __func__, __LINE__);
-		return ret;
-	}
+        ret = set_ep_max_packet_size(uac2_opts, &hs_epin_desc, USB_SPEED_HIGH,
+                                     true);
+        if (ret < 0) {
+                dev_err(dev, "%s:%d Error!\n", __func__, __LINE__);
+                return ret;
+        }
 
-	ret = set_ep_max_packet_size(uac2_opts, &hs_epout_desc, USB_SPEED_HIGH,
-				     false);
-	if (ret < 0) {
-		dev_err(dev, "%s:%d Error!\n", __func__, __LINE__);
-		return ret;
-	}
+        ret = set_ep_max_packet_size(uac2_opts, &hs_epout_desc, USB_SPEED_HIGH,
+                                     false);
+        if (ret < 0) {
+                dev_err(dev, "%s:%d Error!\n", __func__, __LINE__);
+                return ret;
+        }
 
 	agdev->out_ep = usb_ep_autoconfig(gadget, &fs_epout_desc);
 	if (!agdev->out_ep) {

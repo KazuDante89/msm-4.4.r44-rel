@@ -144,7 +144,6 @@ int ovl_permission(struct inode *inode, int mask)
 	}
 
 	err = __inode_permission(realinode, mask);
-
 out_dput:
 	dput(alias);
 	return err;
