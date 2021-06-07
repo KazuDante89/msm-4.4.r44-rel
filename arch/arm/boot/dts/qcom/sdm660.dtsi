@@ -1201,7 +1201,7 @@
 
 	cpubw: qcom,cpubw {
 		compatible = "qcom,devbw";
-		governor = "performance";
+		governor = "bw_hwmon";
 		qcom,src-dst-ports = <1 512>;
 		qcom,active-only;
 		qcom,bw-tbl =
@@ -1232,7 +1232,7 @@
 
 	mincpubw: qcom,mincpubw {
 		compatible = "qcom,devbw";
-		governor = "powersave";
+		governor = "schedutil";
 		qcom,src-dst-ports = <1 512>;
 		qcom,active-only;
 		qcom,bw-tbl =
@@ -1298,7 +1298,7 @@
 		qcom,cpulist = <&CPU0 &CPU1 &CPU2 &CPU3>;
 		qcom,target-dev = <&memlat_cpu0>;
 		qcom,core-dev-table =
-		/*< 902400 762 >,*/
+		  < 902400 762 >,
 			< 1401600 2086 >,
 			< 1843200 3879 >;
 	};
@@ -1318,7 +1318,7 @@
 		mincpubw-cpufreq {
 			target-dev = <&mincpubw>;
 			cpu-to-dev-map-0 =
-			/*< 633600 762 >,*/
+			  < 902400 762 >,
 				< 1401600 1571 >,
 				< 1843200 2929 >;
 			cpu-to-dev-map-4 =
@@ -1464,9 +1464,9 @@
 		qcom,governor-per-policy;
 
 		qcom,cpufreq-table-0 =
-		/*<  633600 >,
+		  <  633600 >,
 			<  902400 >,
-			< 1113600 >,*/
+			< 1113600 >,
 			< 1401600 >,
 			< 1536000 >,
 			< 1747200 >,
