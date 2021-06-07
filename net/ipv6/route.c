@@ -2385,8 +2385,8 @@ struct rt6_info *rt6_add_dflt_router(const struct in6_addr *gwaddr,
 		struct fib6_table *table;
 
 		table = fib6_get_table(dev_net(dev), cfg.fc_table);
-		if (table)
-			table->flags |= RT6_TABLE_HAS_DFLT_ROUTER;
+  //if (table)
+			//table->flags |= RT6_TABLE_HAS_DFLT_ROUTER;
 	}
 
 	return rt6_get_dflt_router(gwaddr, dev);
