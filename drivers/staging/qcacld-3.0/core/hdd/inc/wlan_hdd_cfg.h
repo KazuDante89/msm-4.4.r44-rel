@@ -324,7 +324,7 @@ enum hdd_dot11_mode {
 #define CFG_CHANNEL_BONDING_MODE_24GHZ_NAME    "gChannelBondingMode24GHz"
 #define CFG_CHANNEL_BONDING_MODE_MIN           WNI_CFG_CHANNEL_BONDING_MODE_STAMIN
 #define CFG_CHANNEL_BONDING_MODE_MAX           WNI_CFG_CHANNEL_BONDING_MODE_STAMAX
-#define CFG_CHANNEL_BONDING_MODE_DEFAULT       WNI_CFG_CHANNEL_BONDING_MODE_STADEF
+#define CFG_CHANNEL_BONDING_MODE_DEFAULT       WNI_CFG_CHANNEL_BONDING_MODE_STAMAX
 
 /*
  * <ini>
@@ -348,7 +348,7 @@ enum hdd_dot11_mode {
 #define CFG_OVERRIDE_HT40_20_24GHZ_NAME    "override_ht20_40_24g"
 #define CFG_OVERRIDE_HT40_20_24GHZ_MIN           0
 #define CFG_OVERRIDE_HT40_20_24GHZ_MAX           1
-#define CFG_OVERRIDE_HT40_20_24GHZ_DEFAULT       0
+#define CFG_OVERRIDE_HT40_20_24GHZ_DEFAULT       1
 
 /*
  * <ini>
@@ -371,7 +371,7 @@ enum hdd_dot11_mode {
 #define CFG_CHANNEL_BONDING_MODE_5GHZ_NAME     "gChannelBondingMode5GHz"
 #define CFG_CHANNEL_BONDING_MODE_MIN           WNI_CFG_CHANNEL_BONDING_MODE_STAMIN
 #define CFG_CHANNEL_BONDING_MODE_MAX           WNI_CFG_CHANNEL_BONDING_MODE_STAMAX
-#define CFG_CHANNEL_BONDING_MODE_DEFAULT       WNI_CFG_CHANNEL_BONDING_MODE_STADEF
+#define CFG_CHANNEL_BONDING_MODE_DEFAULT       WNI_CFG_CHANNEL_BONDING_MODE_STAMAX
 
 /*
  * <ini>
@@ -417,7 +417,7 @@ enum hdd_dot11_mode {
 #define CFG_SHORT_GI_20MHZ_NAME                "gShortGI20Mhz"
 #define CFG_SHORT_GI_20MHZ_MIN                 WNI_CFG_SHORT_GI_20MHZ_STAMIN
 #define CFG_SHORT_GI_20MHZ_MAX                 WNI_CFG_SHORT_GI_20MHZ_STAMAX
-#define CFG_SHORT_GI_20MHZ_DEFAULT             WNI_CFG_SHORT_GI_20MHZ_STADEF
+#define CFG_SHORT_GI_20MHZ_DEFAULT             WNI_CFG_SHORT_GI_20MHZ_STAMAX
 
 /*
  * <ini>
@@ -651,7 +651,7 @@ enum hdd_dot11_mode {
 #define CFG_ENABLE_DFS_CHNL_SCAN_NAME              "gEnableDFSChnlScan"
 #define CFG_ENABLE_DFS_CHNL_SCAN_MIN               (0)
 #define CFG_ENABLE_DFS_CHNL_SCAN_MAX               (1)
-#define CFG_ENABLE_DFS_CHNL_SCAN_DEFAULT           (1)
+#define CFG_ENABLE_DFS_CHNL_SCAN_DEFAULT           (0)
 
 /*
  * <ini>
@@ -5128,7 +5128,7 @@ enum station_keepalive_method {
 #define CFG_ENABLE_DFS_CHNL_SCAN_NAME              "gEnableDFSChnlScan"
 #define CFG_ENABLE_DFS_CHNL_SCAN_MIN               (0)
 #define CFG_ENABLE_DFS_CHNL_SCAN_MAX               (1)
-#define CFG_ENABLE_DFS_CHNL_SCAN_DEFAULT           (1)
+#define CFG_ENABLE_DFS_CHNL_SCAN_DEFAULT           (0)
 
 /*
  * <ini>
@@ -13475,7 +13475,7 @@ enum hw_filter_mode {
  */
 
 #define CFG_IS_SAE_ENABLED_NAME    "sae_enabled"
-#define CFG_IS_SAE_ENABLED_DEFAULT (1)
+#define CFG_IS_SAE_ENABLED_DEFAULT (0)
 #define CFG_IS_SAE_ENABLED_MIN     (0)
 #define CFG_IS_SAE_ENABLED_MAX     (1)
 
