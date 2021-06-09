@@ -140,7 +140,7 @@ static struct clk_init_data gpu_clks_init[] = {
 	[0] = {
 		.name = "gfx3d_clk_src",
 		.parent_names = gpucc_parent_names_1,
-		.num_parents = 3,
+		.num_parents = 4,
 		.ops = &clk_gfx3d_src_ops,
 		.flags = CLK_SET_RATE_PARENT,
 	},
@@ -184,7 +184,7 @@ static const struct freq_tbl ftbl_gfx3d_clk_src[] = {
 	F_GFX(585000000, 0,  2, 0, 0, 1170000000),
 	F_GFX(588000000, 0,  2, 0, 0, 1176000000),
 	F_GFX(647000000, 0,  2, 0, 0, 1294000000),
-	F_GFX(700000000, 0,  2, 0, 0, 1400000000),
+	F_GFX(700000000, 0,  2, 0, 0, 1294000000),
 	F_GFX(750000000, 0,  2, 0, 0, 1500000000),
 	{ }
 };
@@ -197,7 +197,7 @@ static const struct freq_tbl ftbl_gfx3d_clk_src_630[] = {
 	F_GFX(465000000, 0,  2, 0, 0,  930000000),
 	F_GFX(588000000, 0,  2, 0, 0, 1176000000),
 	F_GFX(647000000, 0,  2, 0, 0, 1294000000),
-	F_GFX(700000000, 0,  2, 0, 0, 1400000000),
+	F_GFX(700000000, 0,  2, 0, 0, 1294000000),
 	F_GFX(775000000, 0,  2, 0, 0, 1550000000),
 	{ }
 };
@@ -565,4 +565,3 @@ static void __exit gpu_660_exit(void)
 	platform_driver_unregister(&gpu_660_driver);
 }
 module_exit(gpu_660_exit);
-

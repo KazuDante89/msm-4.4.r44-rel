@@ -13,7 +13,7 @@
 };
 
 &pm660l_wled {
-	qcom,fs-curr-ua = <18000>;
+	qcom,fs-curr-ua = <17800>;
 	qcom,led-strings-list = [00 01];
 };
 
@@ -105,4 +105,3 @@
 	#include "batterydata/fg-gen3-batterydata-m6100sun-4000mah.dtsi"
 	#include "batterydata/fg-gen3-batterydata-m6100default-4000mah.dtsi"
 };
-
