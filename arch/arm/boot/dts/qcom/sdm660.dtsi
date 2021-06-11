@@ -160,8 +160,8 @@
 			qcom,limits-info = <&mitigation_profile1>;
 			qcom,lmh-dcvs = <&lmh_dcvs1>;
 			qcom,ea = <&ea4>;
-			efficiency = <1024>;
-			capacity-dmips-mhz = <1024>;
+			efficiency = <1638>;
+			capacity-dmips-mhz = <1638>;
 			sched-energy-costs = <&CPU_COST_1 &CLUSTER_COST_1>;
 			next-level-cache = <&L2_1>;
 			L2_1: l2-cache {
@@ -189,8 +189,8 @@
 			qcom,limits-info = <&mitigation_profile2>;
 			qcom,lmh-dcvs = <&lmh_dcvs1>;
 			qcom,ea = <&ea5>;
-			efficiency = <1024>;
-			capacity-dmips-mhz = <1024>;
+			efficiency = <1638>;
+			capacity-dmips-mhz = <1638>;
 			sched-energy-costs = <&CPU_COST_1 &CLUSTER_COST_1>;
 			next-level-cache = <&L2_1>;
 			L1_I_101: l1-icache {
@@ -214,8 +214,8 @@
 			qcom,limits-info = <&mitigation_profile3>;
 			qcom,lmh-dcvs = <&lmh_dcvs1>;
 			qcom,ea = <&ea6>;
-			efficiency = <1024>;
-			capacity-dmips-mhz = <1024>;
+			efficiency = <1638>;
+			capacity-dmips-mhz = <1638>;
 			sched-energy-costs = <&CPU_COST_1 &CLUSTER_COST_1>;
 			next-level-cache = <&L2_1>;
 			L1_I_102: l1-icache {
@@ -239,8 +239,8 @@
 			qcom,limits-info = <&mitigation_profile4>;
 			qcom,lmh-dcvs = <&lmh_dcvs1>;
 			qcom,ea = <&ea7>;
-			efficiency = <1024>;
-			capacity-dmips-mhz = <1024>;
+			efficiency = <1638>;
+			capacity-dmips-mhz = <1638>;
 			sched-energy-costs = <&CPU_COST_1 &CLUSTER_COST_1>;
 			next-level-cache = <&L2_1>;
 			L1_I_103: l1-icache {
@@ -288,7 +288,7 @@
 					cpu = <&CPU6>;
 				};
 
-				core3 {
+        core3 {
 					cpu = <&CPU7>;
 				};
 			};
@@ -300,13 +300,13 @@
 
 		CPU_COST_0: core-cost0 {
 			busy-cost-data = <
-				 633600   23
-				 902400  312
-				1113600  498
-				1401600  831
-				1536000 1033
-				1747200 1429
-				1843200 1584
+				 633600 23
+				 902400 139
+				1113600 259
+				1401600 482
+				1536000 690
+				1747200 870
+				1843200 1102
 			>;
 			idle-cost-data = <
 				20 16 12 8
@@ -314,11 +314,11 @@
 		};
 		CPU_COST_1: core-cost1 {
 			busy-cost-data = <
-				1113600 1617
-				1401600 2330
-				1747200 3628
-				1958400 4820
-				2150400 5667
+				1113600 749
+				1401600 1443
+				1747200 2576
+				1958400 4153
+				2150400 5941
 				2208000 6688
 			>;
 			idle-cost-data = <
@@ -898,7 +898,7 @@
 	qcom,msm-thermal {
 		compatible = "qcom,msm-thermal";
 		qcom,sensor-id = <1>;
-		qcom,poll-ms = <100>;
+		qcom,poll-ms = <1000>;
 		qcom,therm-reset-temp = <115>;
 		qcom,core-limit-temp = <70>;
 		qcom,core-temp-hysteresis = <10>;
@@ -906,8 +906,8 @@
 		qcom,hotplug-temp-hysteresis = <20>;
 		qcom,online-hotplug-core;
 		qcom,synchronous-cluster-id = <0 1>;
-		qcom,synchronous-cluster-map = <0 4 &CPU0 &CPU1 &CPU2 &CPU3>,
-						<1 4 &CPU4 &CPU5 &CPU6 &CPU7>;
+		qcom,synchronous-cluster-map = <0 3 &CPU0 &CPU1 &CPU2>,
+						<1 3 &CPU4 &CPU5 &CPU6>;
 
 		clock-names = "osm";
 		clocks = <&clock_cpu PWRCL_CLK>;
@@ -1201,7 +1201,7 @@
 
 	cpubw: qcom,cpubw {
 		compatible = "qcom,devbw";
-		governor = "performance";
+		governor = "bw_hwmon";
 		qcom,src-dst-ports = <1 512>;
 		qcom,active-only;
 		qcom,bw-tbl =
@@ -1232,7 +1232,7 @@
 
 	mincpubw: qcom,mincpubw {
 		compatible = "qcom,devbw";
-		governor = "powersave";
+		governor = "cpufreq";
 		qcom,src-dst-ports = <1 512>;
 		qcom,active-only;
 		qcom,bw-tbl =
