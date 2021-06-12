@@ -4564,7 +4564,7 @@ static enum power_supply_property fg_power_props[] = {
 	POWER_SUPPLY_PROP_BATTERY_INFO_ID,
 };
 
-#define FG_RATE_LIM_MS (5 * MSEC_PER_SEC)
+#define FG_RATE_LIM_MS (10 * MSEC_PER_SEC)
 static int fg_power_get_property(struct power_supply *psy,
 				       enum power_supply_property psp,
 				       union power_supply_propval *val)
