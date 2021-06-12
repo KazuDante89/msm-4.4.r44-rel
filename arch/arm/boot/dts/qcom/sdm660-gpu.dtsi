@@ -70,7 +70,7 @@
 		qcom,initial-pwrlevel = <6>;
 
 		/* <HZ/12> */
-		qcom,idle-timeout = <80>;
+		qcom,idle-timeout = <20>;
 
 		qcom,highest-bank-bit = <14>;
 
@@ -121,10 +121,6 @@
 		/* Cx ipeak limit supprt */
 		qcom,gpu-cx-ipeak = <&cx_ipeak_lm 1>;
 		qcom,gpu-cx-ipeak-clk = <700000000>;
-
-		/* CPU latency parameter */
-		qcom,pm-qos-active-latency = <518>;
-		qcom,pm-qos-wakeup-latency = <518>;
 
 		/* Quirks */
 		qcom,gpu-quirk-dp2clockgating-disable;
@@ -441,7 +437,7 @@
 
 				qcom,speed-bin = <135>;
 
-				qcom,initial-pwrlevel = <4>;
+				qcom,initial-pwrlevel = <5>;
 
 				/* NOM_L1 */
 				qcom,gpu-pwrlevel@0 {
