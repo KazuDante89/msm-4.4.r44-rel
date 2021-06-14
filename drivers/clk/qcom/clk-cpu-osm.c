@@ -3088,15 +3088,14 @@ static int clk_osm_acd_init(struct clk_osm *c)
 
 static unsigned long init_rate = 300000000;
 static unsigned long osm_clk_init_rate = 200000000;
-static unsigned long pwrcl_boot_rate = 1401600000;
-static unsigned long perfcl_boot_rate = 1747200000;
+static unsigned long pwrcl_boot_rate = 1747200000;
+static unsigned long perfcl_boot_rate = 2150400000;
 
 static int clk_cpu_osm_driver_probe(struct platform_device *pdev)
 {
 	int rc = 0, cpu, i;
 	int speedbin = 0, pvs_ver = 0;
 	bool is_sdm630 = 0;
-	u32 pte_efuse;
 	int num_clks = ARRAY_SIZE(osm_qcom_clk_hws);
 	struct clk *clk;
 	struct clk *ext_xo_clk, *ext_hmss_gpll0_clk_src;
@@ -3150,10 +3149,6 @@ static int clk_cpu_osm_driver_probe(struct platform_device *pdev)
 	}
 
 	if (pwrcl_clk.vbases[EFUSE_BASE]) {
-		/* Multiple speed-bins are supported */
-		pte_efuse = readl_relaxed(pwrcl_clk.vbases[EFUSE_BASE]);
-		speedbin = ((pte_efuse >> PWRCL_EFUSE_SHIFT) &
-						    PWRCL_EFUSE_MASK);
 		snprintf(pwrclspeedbinstr, ARRAY_SIZE(pwrclspeedbinstr),
 			 "qcom,pwrcl-speedbin%d-v%d", speedbin, pvs_ver);
 	}
@@ -3169,10 +3164,6 @@ static int clk_cpu_osm_driver_probe(struct platform_device *pdev)
 	}
 
 	if (perfcl_clk.vbases[EFUSE_BASE]) {
-		/* Multiple speed-bins are supported */
-		pte_efuse = readl_relaxed(perfcl_clk.vbases[EFUSE_BASE]);
-		speedbin = ((pte_efuse >> PERFCL_EFUSE_SHIFT) &
-							PERFCL_EFUSE_MASK);
 		snprintf(perfclspeedbinstr, ARRAY_SIZE(perfclspeedbinstr),
 			 "qcom,perfcl-speedbin%d-v%d", speedbin, pvs_ver);
 	}
