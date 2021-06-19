@@ -57,7 +57,7 @@ function compile() {
 # Zipping
 function zipping() {
     cd AnyKernel || exit 1
-    zip -r9 [R5.1]-Nebula_v.0.0.1.zip *
+    zip -r9 [R5.3]-Nebula_v.0.0.0.zip *
     cd ..
 }
 sendinfo
