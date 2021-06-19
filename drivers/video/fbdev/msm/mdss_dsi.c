@@ -291,7 +291,7 @@ static ssize_t dsi_access_sysfs_write_store(struct device *dev,
 		return count;
 }
 #endif
-
+ 
 void mdss_dump_dsi_debug_bus(u32 bus_dump_flag,
 	u32 **dump_mem)
 {
@@ -1776,7 +1776,7 @@ int mdss_dsi_on(struct mdss_panel_data *pdata)
 		pr_err("%s: Invalid input data\n", __func__);
 		return -EINVAL;
 	}
-        printk("mdss_dsi_on\n");
+        printk("mdss_dsi_on\n");	
 	ctrl_pdata = container_of(pdata, struct mdss_dsi_ctrl_pdata,
 				panel_data);
 
@@ -1878,7 +1878,7 @@ int mdss_dsi_set_gamma(struct mdss_dsi_ctrl_pdata *ctrl,int val2)
 {
 	int val0,val1;
 
-	printk("guorui:%s\n",__func__);
+	printk("guorui:%s\n",__func__);	
 
 	if(!ctrl) {
 		pr_info("not available\n");
@@ -1893,12 +1893,12 @@ int mdss_dsi_set_gamma(struct mdss_dsi_ctrl_pdata *ctrl,int val2)
 			mdss_dsi_panel_cmds_send(ctrl, &ctrl->gamma0_cmds,CMD_REQ_COMMIT);
 			printk("guorui: %s ,gamma0,line %d \n",__func__,__LINE__);
             return 0;
-		}
+		}	
     }else{
         pr_err("%s:val2 not available\n",__func__);
 		return -EINVAL;
     }
-
+    
 	mdss_dsi_read_reg(ctrl,0xa1,&val0,&val1);
 
     if(0 == val0 || 0 == val1){
@@ -1915,7 +1915,7 @@ int mdss_dsi_set_gamma(struct mdss_dsi_ctrl_pdata *ctrl,int val2)
 				mdss_dsi_panel_cmds_send(ctrl, &ctrl->gamma1_cmds,CMD_REQ_COMMIT);
 				printk("guorui: %s ,gamma1,line %d \n",__func__,__LINE__);
                 return 0;
-			}
+			}	
 		}else if(val1 <= 0x70 && val1 >= 0x6c){
 			if (ctrl->gamma2_cmds.cmd_cnt){
 				mdss_dsi_panel_cmds_send(ctrl, &ctrl->gamma2_cmds,CMD_REQ_COMMIT);
@@ -1941,7 +1941,7 @@ int mdss_dsi_set_gamma(struct mdss_dsi_ctrl_pdata *ctrl,int val2)
 				mdss_dsi_panel_cmds_send(ctrl, &ctrl->gamma9_cmds,CMD_REQ_COMMIT);
 				printk("guorui: %s ,gamma9,line %d \n",__func__,__LINE__);
                 return 0;
-			}
+			}	
 		}else if(val1 <= 0x70 && val1 >= 0x6c){
 			if (ctrl->gamma10_cmds.cmd_cnt){
 				mdss_dsi_panel_cmds_send(ctrl, &ctrl->gamma10_cmds,CMD_REQ_COMMIT);
@@ -1967,7 +1967,7 @@ int mdss_dsi_set_gamma(struct mdss_dsi_ctrl_pdata *ctrl,int val2)
 				mdss_dsi_panel_cmds_send(ctrl, &ctrl->gamma13_cmds,CMD_REQ_COMMIT);
 				printk("guorui: %s ,gamma13,line %d \n",__func__,__LINE__);
                 return 0;
-			}
+			}	
 		}else if(val1 <= 0x70 && val1 >= 0x6c){
 			if (ctrl->gamma14_cmds.cmd_cnt){
 				mdss_dsi_panel_cmds_send(ctrl, &ctrl->gamma14_cmds,CMD_REQ_COMMIT);
@@ -1993,7 +1993,7 @@ int mdss_dsi_set_gamma(struct mdss_dsi_ctrl_pdata *ctrl,int val2)
 				mdss_dsi_panel_cmds_send(ctrl, &ctrl->gamma17_cmds,CMD_REQ_COMMIT);
 				printk("guorui: %s ,gamma17,line %d \n",__func__,__LINE__);
                 return 0;
-			}
+			}	
 		}else if(val1 <= 0x70 && val1 >= 0x6c){
 			if (ctrl->gamma18_cmds.cmd_cnt){
 				mdss_dsi_panel_cmds_send(ctrl, &ctrl->gamma18_cmds,CMD_REQ_COMMIT);
@@ -2019,7 +2019,7 @@ int mdss_dsi_set_gamma(struct mdss_dsi_ctrl_pdata *ctrl,int val2)
 				mdss_dsi_panel_cmds_send(ctrl, &ctrl->gamma21_cmds,CMD_REQ_COMMIT);
 				printk("guorui: %s ,gamma21,line %d \n",__func__,__LINE__);
                 return 0;
-			}
+			}	
 		}else if(val1 <= 0x70 && val1 >= 0x6c){
 			if (ctrl->gamma22_cmds.cmd_cnt){
 				mdss_dsi_panel_cmds_send(ctrl, &ctrl->gamma22_cmds,CMD_REQ_COMMIT);
@@ -2331,88 +2331,6 @@ static irqreturn_t test_hw_vsync_handler(int irq, void *data)
 	if (pdata->next)
 		complete_all(&pdata->next->te_done);
 	return IRQ_HANDLED;
-}
-
-static int mdss_dsi_disp_wake_thread(void *data)
-{
-	struct mdss_panel_data *pdata = data;
-	struct mdss_dsi_ctrl_pdata *ctrl_pdata =
-		container_of(pdata, typeof(*ctrl_pdata), panel_data);
-	struct sched_param param = { .sched_priority = MAX_RT_PRIO - 1 };
-
-	sched_setscheduler(current, SCHED_FIFO, &param);
-
-	wait_event(ctrl_pdata->wake_waitq,
-		atomic_read(&ctrl_pdata->needs_wake));
-
-	/* MDSS_EVENT_LINK_READY */
-	if (ctrl_pdata->refresh_clk_rate)
-		mdss_dsi_clk_refresh(pdata, ctrl_pdata->update_phy_timing);
-	mdss_dsi_on(pdata);
-
-	/* MDSS_EVENT_UNBLANK */
-	mdss_dsi_unblank(pdata);
-
-	/* MDSS_EVENT_PANEL_ON */
-	ctrl_pdata->ctrl_state |= CTRL_STATE_MDP_ACTIVE;
-	pdata->panel_info.esd_rdy = true;
-
-	atomic_set(&ctrl_pdata->needs_wake, 0);
-	complete_all(&ctrl_pdata->wake_comp);
-
-	return 0;
-}
-
-static void mdss_dsi_start_wake_thread(struct mdss_dsi_ctrl_pdata *ctrl_pdata)
-{
-	if (ctrl_pdata->wake_thread)
-		return;
-
-	ctrl_pdata->wake_thread =
-            kthread_run_perf_critical(mdss_dsi_disp_wake_thread,
-					                  &ctrl_pdata->panel_data,
-					                  "mdss_disp_wake");
-	if (IS_ERR(ctrl_pdata->wake_thread)) {
-		pr_err("%s: Failed to start disp-wake thread, rc=%ld\n",
-				__func__, PTR_ERR(ctrl_pdata->wake_thread));
-		ctrl_pdata->wake_thread = NULL;
-	}
-}
-
-static void mdss_dsi_display_wake(struct mdss_dsi_ctrl_pdata *ctrl_pdata)
-{
-	if (atomic_read(&ctrl_pdata->disp_is_on))
-		return;
-
-	atomic_set(&ctrl_pdata->disp_is_on, 1);
-	reinit_completion(&ctrl_pdata->wake_comp);
-
-	/* Make sure the thread is started since it's needed right now */
-	mdss_dsi_start_wake_thread(ctrl_pdata);
-	ctrl_pdata->wake_thread = NULL;
-
-	atomic_set(&ctrl_pdata->needs_wake, 1);
-	wake_up(&ctrl_pdata->wake_waitq);
-}
-
-static int mdss_dsi_fb_unblank_cb(struct notifier_block *nb,
-	unsigned long action, void *data)
-{
-	struct mdss_dsi_ctrl_pdata *ctrl_pdata =
-		container_of(nb, typeof(*ctrl_pdata), wake_notif);
-	struct fb_event *evdata = data;
-	int *blank = evdata->data;
-
-	/* Parse framebuffer blank events as soon as they occur */
-	if (action != FB_EARLY_EVENT_BLANK)
-		return NOTIFY_OK;
-
-	if (*blank == FB_BLANK_UNBLANK)
-		mdss_dsi_display_wake(ctrl_pdata);
-	else
-		mdss_dsi_start_wake_thread(ctrl_pdata);
-
-	return NOTIFY_OK;
 }
 
 int mdss_dsi_cont_splash_on(struct mdss_panel_data *pdata)
