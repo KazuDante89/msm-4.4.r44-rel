@@ -16,7 +16,7 @@
 		qcom,mdss-dsi-panel-name = "boe td4320 fhdplus video mode dsi panel";
 		qcom,mdss-dsi-panel-controller = <&mdss_dsi0>;
 		qcom,mdss-dsi-panel-type = "dsi_video_mode";
-		qcom,mdss-dsi-panel-framerate = <60>;
+		qcom,mdss-dsi-panel-framerate = <61>;
 		qcom,mdss-dsi-virtual-channel-id = <0>;
 		qcom,mdss-dsi-stream = <0>;
 		qcom,mdss-dsi-panel-width = <1080>;
@@ -60,7 +60,7 @@
 	 * reg53: bl pwm duty, dimming, bl work
 	 * reg55: image enhancement select,cabc mode
 	 */
-        qcom,mdss-dsi-on-command = [  
+        qcom,mdss-dsi-on-command = [
 			29 01 00 00 00 00 02 b0 04
 			29 01 00 00 00 00 02 D6 00
 			29 01 00 00 00 00 08 B8 19 55 00 BE 00 00 00
@@ -112,79 +112,79 @@
 			15 01 00 00 00 00 02 51 B8
 		];
 		qcom,mdss-dsi-gamma0-command = [
-          
+
 		];
 		qcom,mdss-dsi-gamma1-command = [
 
 		];
 		qcom,mdss-dsi-gamma2-command = [
-			
+
 		];
 		qcom,mdss-dsi-gamma3-command = [
-			
+
 		];
 		qcom,mdss-dsi-gamma4-command = [
-			                           
+
 		];
 		qcom,mdss-dsi-gamma5-command = [
-			
+
 		];
 		qcom,mdss-dsi-gamma6-command = [
-			
+
 		];
 		qcom,mdss-dsi-gamma7-command = [
-			
+
 		];
 		qcom,mdss-dsi-gamma8-command = [
-			                               
+
 		];
 		qcom,mdss-dsi-gamma9-command = [
-			
+
 		];
 		qcom,mdss-dsi-gamma10-command = [
-			
+
 		];
 		qcom,mdss-dsi-gamma11-command = [
-			
+
 		];
 		qcom,mdss-dsi-gamma12-command = [
-			
+
 		];
 		qcom,mdss-dsi-gamma13-command = [
-			
+
 		];
 		qcom,mdss-dsi-gamma14-command = [
-			
+
 		];
 		qcom,mdss-dsi-gamma15-command = [
-			
+
 		];
 		qcom,mdss-dsi-gamma16-command = [
-			
+
 		];
 		qcom,mdss-dsi-gamma17-command = [
-			
+
 		];
 		qcom,mdss-dsi-gamma18-command = [
-			
+
 		];
 		qcom,mdss-dsi-gamma19-command = [
-			
+
 		];
 		qcom,mdss-dsi-gamma20-command = [
-			
+
 		];
 		qcom,mdss-dsi-gamma21-command = [
-			
+
 		];
 		qcom,mdss-dsi-gamma22-command = [
-			
+
 		];
 		qcom,mdss-dsi-gamma23-command = [
-			
+
 		];
 		qcom,mdss-dsi-gamma24-command = [
-			
+
 		];
 
 		qcom,mdss-dsi-on-command-state = "dsi_lp_mode";
@@ -206,15 +206,29 @@
 		qcom,mdss-dsi-reset-sequence = <1 1>, <0 5>, <1 30>;
 		qcom,mdss-dsi-tx-eot-append;
 		qcom,mdss-dsi-post-init-delay = <1>;
-		
-		qcom,esd-check-enabled;
+
 		qcom,mdss-dsi-panel-status-command = [06 01 00 01 05 00 01 0A];
 		qcom,mdss-dsi-panel-status-command-state = "dsi_hs_mode";
 		qcom,mdss-dsi-panel-status-check-mode = "reg_read";
 		qcom,mdss-dsi-panel-status-read-length = <1>;
 		qcom,mdss-dsi-panel-status-value = <0x1c>;
 		qcom,mdss-dsi-panel-max-error-count = <3>;
- 
+    qcom,panel-ack-disabled;
+		qcom,mdss-dsi-panel-hdr-enabled;
+		qcom,mdss-dsi-panel-hdr-color-primaries = <14500 15500 32000
+			17000 15500 30000 8000 3000>;
+		qcom,mdss-dsi-panel-peak-brightness = <4200000>;
+		qcom,mdss-dsi-panel-blackness-level = <3230>;
+		qcom,partial-update-enabled = "single_roi";
+		qcom,panel-roi-alignment = <540 270 270 270 1080 270>;
+		qcom,mdss-dsi-te-pin-select = <1>;
+		qcom,mdss-dsi-te-dcs-command = <1>;
+		qcom,mdss-dsi-te-check-enable;
+		qcom,mdss-dsi-te-using-te-pin;
+		qcom,mdss-tear-check-sync-init-val = <2280>;
+		qcom,mdss-tear-check-start-pos = <2280>;
+		qcom,mdss-tear-check-rd-ptr-trigger-intr = <2281>;
+
 		cm,mdss-livedisplay-cabc-cmd = [
 				15 01 00 00 00 00 02 55 00
 		];
