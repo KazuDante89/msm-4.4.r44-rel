@@ -115,7 +115,7 @@ void dump_page_badflags(struct page *page, const char *reason,
 #endif
 }
 
-void dump_page(struct page *page, const char *reason)
+//void dump_page(struct page *page, const char *reason)
 {
 	dump_page_badflags(page, reason, 0);
 	dump_page_owner(page);
