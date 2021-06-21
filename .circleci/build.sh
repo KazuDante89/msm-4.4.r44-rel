@@ -1,16 +1,23 @@
 #!/usr/bin/env bash
 echo "Cloning dependencies"
-git clone --depth=1 https://github.com/kdrag0n/proton-clang clang
-git clone --depth=1 https://github.com/KazuDante89/AnyKernel3-EAS -b lavender2 AnyKernel
+git clone --depth=1 https://github.com/KazuDante89/msm-4.4.r44-rel -b  Genshin-gcc_test kernel
+cd kernel
+git clone --depth=1 https://github.com/mvaisakh/gcc-arm64 -b gcc-master gcc64
+git clone --depth=1 https://github.com/mvaisakh/gcc-arm -b gcc-master gcc32
+git clone --depth=1 https://github.com/KazuDante89/AnyKernel3-EAS -b lavender2 AnyKerne
+git clone --depth=1 https://android.googlesource.com/platform/system/libufdt libufdt
 echo "Done"
 IMAGE=$(pwd)/out/arch/arm64/boot/Image.gz-dtb
 TANGGAL=$(date +"%F-%S")
+LOG=$(echo *.log)
 START=$(date +"%s")
-KERNEL_DIR=$(pwd)
-PATH="${PWD}/clang/bin:$PATH"
-export KBUILD_COMPILER_STRING="$(${KERNEL_DIR}/clang/bin/clang --version | head -n 1 | perl -pe 's/\(http.*?\)//gs' | sed -e 's/  */ /g')"
+export CONFIG_PATH=$PWD/arch/arm64/configs/lavender-perf_defconfig
+TC_DIR=${PWD}
+GCC64_DIR="${PWD}/gcc64"
+GCC32_DIR="${PWD}/gcc32"
+PATH="$TC_DIR/bin/:$GCC64_DIR/bin/:$GCC32_DIR/bin/:/usr/bin:$PATH"
 export ARCH=arm64
-export KBUILD_BUILD_HOST=circleci
+export KBUILD_BUILD_HOST="CircleCI"
 export KBUILD_BUILD_USER="kazudante89"
 # Send info plox channel
 function sendinfo() {
@@ -41,23 +48,23 @@ function finerr() {
 }
 # Compile plox
 function compile() {
-    make O=out ARCH=arm64 lavender-perf_defconfig
-    make -j$(nproc --all) O=out \
-                          ARCH=arm64 \
-			                    CC=clang \
-			                    CROSS_COMPILE=aarch64-linux-gnu- \
-			                    CROSS_COMPILE_ARM32=arm-linux-gnueabi-
-
-    if ! [ -a "$IMAGE" ]; then
-        finerr
-        exit 1
-    fi
-    cp out/arch/arm64/boot/Image.gz-dtb AnyKernel
+   make O=out ARCH=arm64 lavender-perf_defconfig
+       make -j$(nproc --all) O=out \
+                             ARCH=arm64 \
+			     CROSS_COMPILE_ARM32=arm-eabi- \
+			     CROSS_COMPILE=aarch64-elf- \
+			     AR=aarch64-elf-ar \
+			     OBJDUMP=aarch64-elf-objdump \
+			     STRIP=aarch64-elf-strip 2>&1 | tee error.log
+   cp out/arch/arm64/boot/Image.gz-dtb AnyKernel
+   python2 "libufdt/utils/src/mkdtboimg.py" \
+					create "out/arch/arm64/boot/dtbo.img" --page_size=4096 out/arch/arm64/boot/dts/qcom/*.dtbo
+   cp out/arch/arm64/boot/dtbo.img AnyKernel
 }
 # Zipping
 function zipping() {
     cd AnyKernel || exit 1
-    zip -r9 [R1]-GenshinKernel_v.0.1.zip *
+    zip -r9 [R1]-GenshinKernel_v.0.0.zip *
     cd ..
 }
 sendinfo
@@ -65,4 +72,5 @@ compile
 zipping
 END=$(date +"%s")
 DIFF=$(($END - $START))
+finerr
 push
