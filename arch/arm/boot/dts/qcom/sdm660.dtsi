@@ -54,8 +54,8 @@
 			qcom,limits-info = <&mitigation_profile0>;
 			qcom,lmh-dcvs = <&lmh_dcvs0>;
 			qcom,ea = <&ea0>;
-      capacity-dmips-mhz = <1024>;
-			efficiency = <1024>;
+      capacity-dmips-mhz = <1130>;
+			efficiency = <1130>;
       sched-energy-costs = <&CPU_COST_0 &CLUSTER_COST_0>;
 			next-level-cache = <&L2_0>;
 			L2_0: l2-cache {
@@ -85,8 +85,8 @@
 			qcom,limits-info = <&mitigation_profile0>;
 			qcom,lmh-dcvs = <&lmh_dcvs0>;
 			qcom,ea = <&ea1>;
-      capacity-dmips-mhz = <1024>;
-			efficiency = <1024>;
+      capacity-dmips-mhz = <1130>;
+			efficiency = <1130>;
       sched-energy-costs = <&CPU_COST_0 &CLUSTER_COST_0>;
 			next-level-cache = <&L2_0>;
 			L1_I_1: l1-icache {
@@ -110,8 +110,8 @@
 			qcom,limits-info = <&mitigation_profile0>;
 			qcom,lmh-dcvs = <&lmh_dcvs0>;
 			qcom,ea = <&ea2>;
-      capacity-dmips-mhz = <1024>;
-			efficiency = <1024>;
+      capacity-dmips-mhz = <1130>;
+			efficiency = <1130>;
       sched-energy-costs = <&CPU_COST_0 &CLUSTER_COST_0>;
 			next-level-cache = <&L2_0>;
 			L1_I_2: l1-icache {
@@ -135,8 +135,8 @@
 			qcom,limits-info = <&mitigation_profile0>;
 			qcom,lmh-dcvs = <&lmh_dcvs0>;
 			qcom,ea = <&ea3>;
-      capacity-dmips-mhz = <1024>;
-			efficiency = <1024>;
+      capacity-dmips-mhz = <1130>;
+			efficiency = <1130>;
       sched-energy-costs = <&CPU_COST_0 &CLUSTER_COST_0>;
 			next-level-cache = <&L2_0>;
 			L1_I_3: l1-icache {
@@ -300,13 +300,13 @@
 
 		CPU_COST_0: core-cost0 {
 			busy-cost-data = <
-				633600	41
-				902400	70
-				1113600	83
-				1401600	146
-				1536000	158
-				1747200	228
-				1843200	285
+				633600	49
+				902400	82
+				1113600	88
+				1401600	139
+				1536000	161
+				1747200	211
+				1843200	263
 			>;
 			idle-cost-data = <
 				20 16 10 8
@@ -315,12 +315,12 @@
 
 		CPU_COST_1: core-cost1 {
 			busy-cost-data = <
-				1113600	307
-				1401600	485
-				1747200	857
-				1958400	1222
-				2150400	1592
-				2457600	2080
+				1113600	263
+				1401600	374
+				1747200	557
+				1958400	698
+				2150400	799
+				2457600	1035
 			>;
 			idle-cost-data = <
 				100 80 60 40
