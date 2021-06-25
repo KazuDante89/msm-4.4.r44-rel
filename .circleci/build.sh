@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 echo "Cloning dependencies"
-git clone --depth=1 https://github.com/kdrag0n/proton-clang clang
+# git clone --depth=1 https://github.com/kdrag0n/proton-clang clang
+git clone --depth=1 https://github.com/okta-10/gcc-arm64.git arm64
+git clone --depth=1 https://github.com/okta-10/gcc-arm32.git arm32
 git clone --depth=1 https://github.com/KazuDante89/AnyKernel3-EAS -b lavender2 AnyKernel
 echo "Done"
 IMAGE=$(pwd)/out/arch/arm64/boot/Image.gz-dtb
@@ -8,8 +10,11 @@ TANGGAL=$(date +"%F-%S")
 START=$(date +"%s")
 KERNEL_DIR=$(pwd)
 PATH="${PWD}/clang/bin:$PATH"
-export KBUILD_COMPILER_STRING="$(${KERNEL_DIR}/clang/bin/clang --version | head -n 1 | perl -pe 's/\(http.*?\)//gs' | sed -e 's/  */ /g')"
+# export KBUILD_COMPILER_STRING="$(${KERNEL_DIR}/clang/bin/clang --version | head -n 1 | perl -pe 's/\(http.*?\)//gs' | sed -e 's/  */ /g')"
 export ARCH=arm64
+export SUBARCH=arm64
+export CROSS_COMPILE="${PWD}/arm64/bin/aarch64-elf-"
+export CROSS_COMPILE_ARM32="${PWD}/arm32/bin/arm-eabi-"
 export KBUILD_BUILD_HOST=circleci
 export KBUILD_BUILD_USER="kazudante89"
 # Send info plox channel
@@ -44,9 +49,9 @@ function compile() {
     make O=out ARCH=arm64 lavender-perf_defconfig
     make -j$(nproc --all) O=out \
                           ARCH=arm64 \
-			                    CC=clang \
-			                    CROSS_COMPILE=aarch64-linux-gnu- \
-			                    CROSS_COMPILE_ARM32=arm-linux-gnueabi-
+			                    # CC=clang \
+			                    # CROSS_COMPILE=aarch64-linux-gnu- \
+			                    # CROSS_COMPILE_ARM32=arm-linux-gnueabi-
 
     if ! [ -a "$IMAGE" ]; then
         finerr
