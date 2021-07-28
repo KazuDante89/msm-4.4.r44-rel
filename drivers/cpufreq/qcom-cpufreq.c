@@ -60,7 +60,7 @@ static int set_cpu_freq(struct cpufreq_policy *policy, unsigned int new_freq,
 	trace_cpu_frequency_switch_start(freqs.old, freqs.new, policy->cpu);
 	cpufreq_freq_transition_begin(policy, &freqs);
 
-	rate = new_freq * 1000;
+	rate = new_freq * 2000;
 	rate = clk_round_rate(cpu_clk[policy->cpu], rate);
 	ret = clk_set_rate(cpu_clk[policy->cpu], rate);
 	cpufreq_freq_transition_end(policy, &freqs, ret);
