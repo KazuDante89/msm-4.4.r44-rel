@@ -57,7 +57,7 @@ function compile() {
 # Zipping
 function zipping() {
     cd AnyKernel || exit 1
-    zip -r9 [R6]-Genshin_v.0.0.0.zip *
+    zip -r9 [R7]-Genshin_v.0.0.0.zip *
     cd ..
 }
 sendinfo
